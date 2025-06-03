@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags %}
+
+{% block content %}
+<div>{{ page.subtitle }}
+</div>
+    {% for block in page.content %}
+        <p>Block type: {{ block.block_type }}</p>
+
+        {% include_block block %}
+    {% endfor %}
+{% endblock content %}
