@@ -44,3 +44,16 @@ class SimpleRichTextBlocks(blocks.RichTextBlock):
         template = 'stream/rich_text_block.html'
         icon = 'edit'
         label = 'Simple Text'
+        
+
+class CTABlock(blocks.StructBlock):
+    title = blocks.RichTextBlock(required=True, max_length=60, null=True,)
+    text = blocks.TextBlock(required=True, max_length=260, null=True)
+    button_page = blocks.PageChooserBlock(required=False, help_text = 'Add a link if needed')
+    button_url = blocks.URLBlock(required=False, help_text = 'Add a link if needed')
+    button_text = blocks.CharBlock(required=False, default='Read More')
+    
+    class Meta:  # noqa
+        template = 'stream/cta_block.html'
+        icon = 'edit'
+        label = 'Call to Action'       

@@ -13,6 +13,7 @@ class Flex(Page):
             ('rich_text', blocks.RichTextBlocks()), 
             ('simple_text', blocks.SimpleRichTextBlocks()), 
             ('card_blocks', blocks.CardBlocks()), 
+            ('cta_blocks', blocks.CTABlock()), 
         ],
         use_json_field=True,
         default=list,  # default must be iterable

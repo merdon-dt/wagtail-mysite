@@ -1,0 +1,11 @@
+{% load static wagtailcore_tags %}
+
+<div class="container">
+  <h2>{{self.title}}</h2>
+  <p>{{self.title| richtext}}</p>
+  {% if self.button_page %}
+  <a href="{{self.button_page.url}}">{{self.button_text}}</a>
+  {% elif self.button_url %}
+  <a href="{{self.button_url}}">{{self.button_text}}</a>
+  {% endif %}
+</div>
