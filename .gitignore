@@ -1,0 +1,24 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Env
+.env
+.env.*
+
+# Django-related
+*.log
+*.pot
+*.pyc
+db.sqlite3
+
+# Wagtail
+media/
+staticfiles/
+
+# Node
+node_modules/
+
+# OS
+.DS_Store

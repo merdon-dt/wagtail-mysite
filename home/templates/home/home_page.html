@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags  %}
+
+{% block body_class %}template-homepage{% endblock %}
+
+{% block content %}
+{% image page.banner_image fill-400x400 as img %}
+<div class="card" style="height: 100dvh; background-image: url('{{img.url}}'); background-size:cover" >
+  <img src="..." class="card-img-top" alt="...">
+  <div class="card-body">
+    <h5 class="card-title">{{page.title}}</h5>
+    <p class="card-text">{{page.banner_title |richtext}}</p>
+    {% if page.banner_cta %}
+        <a href="#" class="btn btn-primary">{{page.banner_cta}}</a>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock content %}
