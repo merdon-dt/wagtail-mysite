@@ -2,7 +2,7 @@
 
 <div class="container">
   <h2>{{self.title}}</h2>
-  <p>{{self.title| richtext}}</p>
+  <p>{{self.text| richtext}}</p>
   {% if self.button_page %}
   <a href="{{self.button_page.url}}">{{self.button_text}}</a>
   {% elif self.button_url %}
