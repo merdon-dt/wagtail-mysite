@@ -9,4 +9,13 @@
 
         {% include_block block %}
     {% endfor %}
+
+    <div id="react-root"></div>
+
+  <!-- React JS bundle -->
+  <script type="module" src="{% static 'js/react-widget.js' %}"></script>
+  <script>
+  window.initialData = {{ some_context_var|json_script:"initial-data" }};
+</script>
+
 {% endblock content %}

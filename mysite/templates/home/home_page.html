@@ -4,14 +4,14 @@
 {% block body_class %}template-homepage{% endblock %}
 
 {% block content %}
-{% image page.banner_image fill-400x400 as img %}
+{% image page.banner_image fill-400x100 as img %}
 <div class="card" style="background-image: url('{{img.url}}'); background-size:cover">
-  <img src="..." class="card-img-top" alt="..." />
+  {% comment %} <img src={{img.url}} class="card-img-top" alt={{img.alt}} /> {% endcomment %}
   <div class="card-body">
     <h5 class="card-title">{{page.title}}</h5>
     <p class="card-text">{{page.banner_title|richtext}}</p>
     {% if page.banner_page_link %}
-    <a href="{{page.banner_page_link.url}}" class="btn btn-primary">{{page.banner_cta}}</a>
+    <a href="{{page.banner_page_link.url}}" target="_blank" class="btn btn-primary">{{page.banner_cta}}</a>
     {% endif %}
   </div>
   

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-12">
+
+      <!-- Blog Title -->
+      <h1 class="mb-4">{{ self.blog_title }}</h1>
+
+      <ul>
+    {% for iter in self.author_tags.all %}
+    {% image iter.author.author_image fill-50x50 as img%}
+        <li>
+            <img src={{img.url}} alt{{img.alt}} />
+            <h2>{{iter.author.author_name}}
+                <a href={{iter.author.author_website}}>(website)</a>
+            </h2></li>
+        {% endfor %}
+      </ul>
+
+      <!-- Blog Image -->
+      {% if self.blog_image %}
+        {% image self.blog_image fill-800x400 as blog_img %}
+        <img src="{{ blog_img.url }}" alt="{{ blog_img.alt }}" class="img-fluid mb-4 rounded shadow" />
+      {% endif %}
+
+      <!-- StreamField Content -->
+      <div class="blog-stream-content">
+        {{ self.content }}
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
