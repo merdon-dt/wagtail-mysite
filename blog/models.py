@@ -11,6 +11,8 @@ from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.snippets.models import register_snippet
 
 from modelcluster.fields import ParentalKey
+from modelcluster.fields import ParentalManyToManyField
+from django import forms
 
 
 
@@ -37,6 +39,8 @@ class BlogListingPage(RoutablePageMixin, Page):
 
         posts = BlogDetailsPage.objects.live().public()
         context["posts"] = posts  # ✅ Add this line back
+        context["categories"] = BlogCategory.objects.all()
+
 
         # Optional: JSON version for React
         serialized_posts = [
@@ -75,6 +79,7 @@ class BlogDetailsPage(Page):
         on_delete=models.SET_NULL,
         related_name='+',
     )
+    categories = ParentalManyToManyField('blog.BlogCategory', blank=True)
 
     content = StreamField(
         [
@@ -92,10 +97,13 @@ class BlogDetailsPage(Page):
     content_panels = Page.content_panels + [
         FieldPanel('blog_title'),
         FieldPanel('blog_image'),
-        FieldPanel('content'),
         MultiFieldPanel([
             InlinePanel('author_tags', label='Authors', min_num=1, max_num=3),
-        ])
+        ]),
+        MultiFieldPanel([
+            FieldPanel('categories', widget=forms.CheckboxSelectMultiple),
+        ],heading='Categories'),
+        FieldPanel('content'),
     ]
 
 @register_snippet
@@ -127,3 +135,75 @@ class AuthorTag(Orderable):
     panels = [
         FieldPanel('author')
     ]
+    
+
+class BlogCategory(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(
+        verbose_name="slug",
+        allow_unicode=True,
+        max_length=255,
+        help_text='A slug to identify posts by this category',
+    )  
+    panels = [
+        FieldPanel('name'),
+        FieldPanel('slug'),
+    ]  
+    
+    class Meta:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+register_snippet(BlogCategory)
+
+class ArticleBlogPage(BlogDetailsPage):
+    template = 'blog/article_blog_page.html'
+    
+    custom_title = models.CharField(max_length=100, blank=True, null=True)
+    subtitle = models.CharField(max_length=100, blank=True, null=True)
+    
+    content_panels = Page.content_panels + [
+        FieldPanel('blog_title'),
+        FieldPanel('custom_title'),
+        FieldPanel('subtitle'),
+        FieldPanel('blog_image'),
+        MultiFieldPanel([
+            InlinePanel('author_tags', label='Authors', min_num=1, max_num=3),
+        ]),
+        MultiFieldPanel([
+            FieldPanel('categories', widget=forms.CheckboxSelectMultiple),
+        ],heading='Categories'),
+        FieldPanel('content'),
+    ]
+    class Meta:
+        verbose_name = 'Article BLog Page'
+        verbose_name_plural = 'Articles Blog Page'
+        
+    def __str__(self):
+        return self.custom_title
+            
+            
+class VideoBlogPage(BlogDetailsPage):
+    template = 'blog/video_blog_page.html'
+    
+    youtube_video_id = models.CharField(max_length=100, blank=True, null=True)
+    
+    content_panels = Page.content_panels + [
+        FieldPanel('blog_title'),
+        FieldPanel('youtube_video_id'),
+        FieldPanel('blog_image'),
+        MultiFieldPanel([
+            InlinePanel('author_tags', label='Authors', min_num=1, max_num=3),
+        ]),
+        MultiFieldPanel([
+            FieldPanel('categories', widget=forms.CheckboxSelectMultiple),
+        ],heading='Categories'),
+        FieldPanel('content'),
+    ]
+    
+    class Meta:
+        verbose_name = 'Video BLog Page'
+        verbose_name_plural = 'Videos Blog Page'
