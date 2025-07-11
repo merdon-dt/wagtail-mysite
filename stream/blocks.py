@@ -1,5 +1,7 @@
 from wagtail import blocks
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.blocks.struct_block import StructValue
+
 
 
 class TextAndTitleBlocks(blocks.StructBlock):
@@ -56,4 +58,37 @@ class CTABlock(blocks.StructBlock):
     class Meta:  # noqa
         template = 'stream/cta_block.html'
         icon = 'edit'
-        label = 'Call to Action'       
+        label = 'Call to Action'  
+
+        
+class LinkStructBlock(StructValue):
+    
+    def url(self):
+        page = self.get('page_url')
+        external_url = self.get('page_link')
+        if page:
+            print("the page url is", page)
+            return page.url
+        elif external_url:
+            print("the page url is", external_url)
+            return external_url
+        return None
+    def title(self):
+        page = self.get('page_url')
+        external_url = self.get('page_link')
+        if page:
+            return page.title
+        elif external_url:
+            return external_url  # or you can return a hardcoded label like "External Link"
+        return "Untitled"
+
+class SingleButtonBlock(blocks.StructBlock):
+    
+    page_url = blocks.PageChooserBlock(required=False, help_text = 'Add a page url, If added it would be primary button')             
+    page_link = blocks.URLBlock(required=False, help_text = 'Add a link if needed')
+    
+    class Meta: #noqa
+        template = 'stream/single_button_block.html'
+        icon = 'button'
+        label = 'Single Button'
+        value_class = LinkStructBlock

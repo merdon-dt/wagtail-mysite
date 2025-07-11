@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static wagtailimages_tags cache %}
+
+{% block content %}
+<div class="container my-5">
+  <h1 class="mb-4">{{ self.custom_title }}</h1>
+
+  <!-- ✅ Server-rendered blog list -->
+  <div class="row g-4">
+    {% for post in posts %}
+      {% cache 68640 blog_post_preview post.id %}
+          {% image post.blog_image fill-300x200 as blog_img %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+              <a href="{{ post.url }}">
+                <img src="{{ blog_img.url }}" alt="{{ blog_img.alt }}" class="card-img-top">
+              </a>
+              <div class="card-body">
+                <h5 class="card-title">
+                  <a href="{{ post.url }}" class="text-decoration-none text-dark">
+                    {{ post.blog_title }}
+                  </a>
+                </h5>
+              </div>
+            </div>
+          </div>
+      {% endcache %}
+    {% endfor %}
+  </div>
+
+  <!-- ✅ React fallback -->
+  <script type="application/json" id="posts-data">
+    {{ posts_json|safe }}
+  </script>
+  <div id="blog-page" class="mt-5"></div>
+
+  <!-- ✅ React JS bundle -->
+  <script type="module" src="{% static 'js/react-widget.js' %}"></script>
+</div>
+{% endblock %}

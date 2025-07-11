@@ -1,11 +1,18 @@
 {% load static wagtailcore_tags %}
 
-<div class="container">
-  <h2>{{self.title}}</h2>
-  <p>{{self.title| richtext}}</p>
-  {% if self.button_page %}
-  <a href="{{self.button_page.url}}">{{self.button_text}}</a>
-  {% elif self.button_url %}
-  <a href="{{self.button_url}}">{{self.button_text}}</a>
-  {% endif %}
+<div class="container my-5">
+  <div class="text-center bg-light p-4 rounded shadow-sm">
+    <h2 class="mb-3">{{ self.title|richtext }}</h2>
+    <p class="mb-4">{{ self.text|richtext }}</p>
+
+    {% if self.button_page %}
+      <a href="{{ self.button_page.url }}" class="btn btn-primary">
+        {{ self.button_text }}
+      </a>
+    {% elif self.button_url %}
+      <a href="{{ self.button_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        {{ self.button_text }}
+      </a>
+    {% endif %}
+  </div>
 </div>

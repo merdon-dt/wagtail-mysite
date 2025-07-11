@@ -1,47 +1,83 @@
-{% load static wagtailcore_tags wagtailuserbar %}
+{% load static wagtailcore_tags wagtailuserbar menus_tags cache %}
+{% get_menu "main" as navigator %}
 
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>
-            {% block title %}
+<head>
+    <meta charset="utf-8" />
+    <title>
+        {% block title %}
             {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
-            {% endblock %}
-            {% block title_suffix %}
+        {% endblock %}
+        {% block title_suffix %}
             {% wagtail_site as current_site %}
-            {% if current_site and current_site.site_name %}- {{ current_site.site_name }}{% endif %}
-            {% endblock %}
-        </title>
-        {% if page.search_description %}
-        <meta name="description" content="{{ page.search_description }}" />
-        {% endif %}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+            {% if current_site and current_site.site_name %} - {{ current_site.site_name }}{% endif %}
+        {% endblock %}
+    </title>
 
-        {# Force all links in the live preview panel to be opened in a new tab #}
-        {% if request.in_preview_panel %}
+    {% if page.search_description %}
+        <meta name="description" content="{{ page.search_description }}">
+    {% endif %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% if request.in_preview_panel %}
         <base target="_blank">
-        {% endif %}
+    {% endif %}
 
-        {# Global stylesheets #}
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" href="{% static 'css/mysite.css' %}">
+    <!-- ✅ Bootstrap & CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/mysite.css' %}">
 
-        {% block extra_css %}
-        {# Override this in templates to add extra stylesheets #}
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="d-flex flex-column min-vh-100 {% block body_class %}{% endblock %}">
+    {% wagtailuserbar %}
+
+    <!-- ✅ Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">MySite</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                {% cache 68640 nav_menu %}
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        {% for item in navigator.menu_items.all %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ item.link }}" {% if item.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                                    {{ item.title }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endcache %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- ✅ Main content -->
+    <main class="container my-5 flex-grow-1">
+        {% block content %}
+        <p class="text-center">Welcome to MySite</p>
         {% endblock %}
-    </head>
+    </main>
 
-    <body class="{% block body_class %}{% endblock %}">
-        {% wagtailuserbar %}
+    <!-- ✅ Footer -->
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <div class="container">
+            <small>&copy; {{ current_site.site_name|default:"MySite" }} {{ now|date:"Y" }}</small>
+        </div>
+    </footer>
 
-        {% block content %}{% endblock %}
-
-        {# Global javascript #}
-        <script type="text/javascript" src="{% static 'js/mysite.js' %}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-        {% block extra_js %}
-        {# Override this in templates to add extra javascript #}
-        {% endblock %}
-    </body>
+    <!-- ✅ Scripts -->
+    <script src="{% static 'js/mysite.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
 </html>
