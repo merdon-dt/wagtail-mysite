@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags cache %}
+
+{% block content %}
+  {% comment %} {% cache 68640 blog_details %} {% endcomment %}
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+          <!-- ✅ Blog Title -->
+          <h1 class="mb-4">{{ self.blog_title }}</h1>
+
+          <!-- ✅ Categories -->
+          {% if self.categories.count %}
+            <div class="mb-3">
+              <strong>Categories:</strong>
+              {% for cat in self.categories.all %}
+                <a href="{{ self.get_parent.url }}?category={{ cat.slug }}" class="badge bg-secondary text-decoration-none me-2">
+                  {{ cat.name }}
+                </a>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- ✅ Authors -->
+          {% if self.author_tags.all %}
+            <div class="d-flex flex-wrap align-items-center gap-4 mb-4">
+              {% for iter in self.author_tags.all %}
+                <div class="d-flex align-items-center gap-2">
+                  {% image iter.author.author_image fill-50x50 as img %}
+                  <img src="{{ img.url }}" alt="{{ img.alt }}" class="rounded-circle" width="50" height="50" />
+                  <div>
+                    <strong>{{ iter.author.author_name }}</strong><br />
+                    {% if iter.author.author_website %}
+                      <a href="{{ iter.author.author_website }}" target="_blank" class="small">(website)</a>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- ✅ Blog Image -->
+          {% if self.blog_image %}
+            {% image self.blog_image fill-800x400 as blog_img %}
+            <img src="{{ blog_img.url }}" alt="{{ blog_img.alt }}" class="img-fluid rounded mb-4 shadow-sm" />
+          {% endif %}
+
+          <!-- ✅ StreamField Content -->
+          <div class="blog-stream-content">
+            {% for block in self.content %}
+              <div class="mb-5">
+                {% include_block block %}
+              </div>
+            {% endfor %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  {% comment %} {% endcache %} {% endcomment %}
+{% endblock %}

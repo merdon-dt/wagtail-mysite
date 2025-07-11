@@ -28,7 +28,17 @@ INSTALLED_APPS = [
     "search",
     "flex",
     "stream",
+    "site_settings",
+    "subscribers",
+    "blog",
+    "subscribe",
+    "menus",
+    "contact",
+    "wagtail.api.v2",
     
+    "rest_framework",
+    
+    'wagtail.contrib.settings',
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",
@@ -77,6 +87,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'wagtail.contrib.settings.context_processors.settings', 
             ],
         },
     },
@@ -136,10 +147,11 @@ STATICFILES_FINDERS = [
 ]
 
 STATICFILES_DIRS = [
-    os.path.join(PROJECT_DIR, "static"),
+    # os.path.join(PROJECT_DIR, "static"),
+    os.path.join(BASE_DIR, 'static'),
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/static/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
