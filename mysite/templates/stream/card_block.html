@@ -1,26 +1,33 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
 
-<div class="container">
-  <h2>{{self.title}}</h2>
-  <div class="d-flex gap-5 justify-content-center">
-    {% for card in self.card %} {% image card.image fill-300x240 as img%}
-    <div class="card" style="width: 18rem; display: ">
-      <img src="{{img.url}}" class="card-img-top" alt="{{img.alt}}" />
-      <div class="card-body">
-        <h5 class="card-title">{{card.title}}</h5>
-        <p class="card-text">{{card.text}}</p>
-        {% if card.button_page %}
-        <a href="{{card.button_page.url}}" class="btn btn-primary"
-          >Learn more(internal)</a
-        >
-        {% elif card.button_url %}
-        <a href="{{card.button_url}}" target="_blank" rel="noopener noreferrer" class="btn btn-primary"
-          >Learn more(external)</a
-        >
-        {% endif %}
+<div class="container my-5">
+  <h2 class="text-center mb-4">{{ self.title }}</h2>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for card in self.card %}
+      <div class="col">
+        <div class="card h-100 shadow-sm border-0">
+          {% image card.image fill-300x240 as img %}
+          <img src="{{ img.url }}" class="card-img-top" alt="{{ img.alt }}">
+
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ card.title }}</h5>
+            <p class="card-text">{{ card.text }}</p>
+
+            {% if card.button_page %}
+              <a href="{{ card.button_page.url }}" class="btn btn-outline-primary mt-auto" aria-label="Learn more about {{ card.title }}">
+                Learn more
+              </a>
+            {% elif card.button_url %}
+              <a href="{{ card.button_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary mt-auto" aria-label="Visit external page for {{ card.title }}">
+                Learn more
+              </a>
+            {% endif %}
+          </div>
+        </div>
       </div>
-    </div>
     {% endfor %}
   </div>
-  <hr />
+
+  <hr class="mt-5" />
 </div>

@@ -4,56 +4,66 @@
 {% block body_class %}template-homepage{% endblock %}
 
 {% block content %}
-{% image page.banner_image fill-400x100 as img %}
-<div class="card" style="background-image: url('{{img.url}}'); background-size:cover">
-  {% comment %} <img src={{img.url}} class="card-img-top" alt={{img.alt}} /> {% endcomment %}
-  <div class="card-body">
-    <h5 class="card-title">{{page.title}}</h5>
-    <p class="card-text">{{page.banner_title|richtext}}</p>
+{% image page.banner_image fill-1600x500 as img %}
+
+<!-- ✅ Hero Banner with Background Image -->
+<section class="py-5 text-white text-center" style="background: url('{{ img.url }}') no-repeat center center / cover;">
+  <div class="container py-5 bg-dark bg-opacity-50 rounded">
+    <h1 class="display-5 fw-bold">{{ page.title }}</h1>
+    <div class="lead mb-3">{{ page.banner_title|richtext }}</div>
     {% if page.banner_page_link %}
-    <a href="{{page.banner_page_link.url}}" target="_blank" class="btn btn-primary">{{page.banner_cta}}</a>
+      <a href="{{ page.banner_page_link.url }}" class="btn btn-primary btn-lg">{{ page.banner_cta }}</a>
     {% endif %}
   </div>
-  
-  {% for block in page.content %}
-    {% include_block block %}
-  {% endfor %}
-  
-  {% if page.carousel_items.all %}
-  <div id="carouselExampleCaptions" class="carousel slide">
-    <div class="carousel-indicators">
-      {% for item in page.carousel_items.all %}
-      <button type="button" 
-              data-bs-target="#carouselExampleCaptions" 
-              data-bs-slide-to="{{ forloop.counter0 }}" 
-              {% if forloop.first %}class="active" aria-current="true"{% endif %}
-              aria-label="Slide {{ forloop.counter }}"></button>
-      {% endfor %}
-    </div>
-    
-    <div class="carousel-inner">
-      {% for item in page.carousel_items.all %}
-      {% image item.image fill-900x500 as carousel_img %}
-      <div class="carousel-item {% if forloop.first %}active{% endif %}">
-        <img src="{{ carousel_img.url }}" class="d-block w-100" alt="{{ carousel_img.alt }}">
-        <div class="carousel-caption d-none d-md-block">
-          <h5>{{ item.title }}</h5>
-          <div>{{ item.caption|richtext }}</div>
-        </div>
+</section>
+
+<!-- ✅ StreamField Blocks -->
+{% for block in page.content %}
+  {% include_block block %}
+{% endfor %}
+
+<!-- ✅ Carousel Section -->
+{% if page.carousel_items.all %}
+<section class="py-5">
+  <div class="container">
+    <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+      
+      <!-- Indicators -->
+      <div class="carousel-indicators">
+        {% for item in page.carousel_items.all %}
+          <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ forloop.counter0 }}"
+                  class="{% if forloop.first %}active{% endif %}"
+                  aria-current="{% if forloop.first %}true{% endif %}"
+                  aria-label="Slide {{ forloop.counter }}"></button>
+        {% endfor %}
       </div>
-      {% endfor %}
+
+      <!-- Carousel Items -->
+      <div class="carousel-inner rounded shadow">
+        {% for item in page.carousel_items.all %}
+          {% image item.image fill-1200x500 as carousel_img %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <img src="{{ carousel_img.url }}" class="d-block w-100" alt="{{ carousel_img.alt }}">
+            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 p-3 rounded">
+              <h5>{{ item.title }}</h5>
+              <div>{{ item.caption|richtext }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Controls -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
     </div>
-    
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
   </div>
-  {% endif %}
-</div>
+</section>
+{% endif %}
 
 {% endblock content %}

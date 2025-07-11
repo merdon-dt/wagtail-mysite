@@ -13,7 +13,8 @@ from wagtail.snippets.models import register_snippet
 from modelcluster.fields import ParentalKey
 from modelcluster.fields import ParentalManyToManyField
 from django import forms
-
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 
 
 import json
@@ -105,6 +106,17 @@ class BlogDetailsPage(Page):
         ],heading='Categories'),
         FieldPanel('content'),
     ]
+    
+    def save(self, *args, **kwargs):
+        # Clear preview cache
+        preview_key = make_template_fragment_key('blog_post_preview', [self.id])
+        cache.delete(preview_key)
+
+        # Clear blog details cache
+        # details_key = make_template_fragment_key('blog_details')
+        # cache.delete(details_key)
+
+        return super().save(*args, **kwargs)
 
 @register_snippet
 class BlogAuthor(models.Model):

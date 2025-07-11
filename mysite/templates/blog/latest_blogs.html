@@ -2,31 +2,37 @@
 {% load static wagtailimages_tags %}
 
 {% block content %}
-  <h1>{{ self.custom_title }}</h1>
+<div class="container my-5">
+  <h1 class="mb-4">{{ self.custom_title }}</h1>
 
-  <!-- Server-side rendered fallback (optional) -->
-  <div>
+  <!-- ✅ Server-side rendered fallback -->
+  <div class="row g-4">
     {% for post in posts_limit %}
       {% image post.blog_image fill-300x200 as blog_img %}
-      <div class="row mb-3">
-        <div class="col-3">
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
           <a href="{{ post.url }}">
-            <img src="{{ blog_img.url }}" alt="{{ blog_img.alt }}" class="img-fluid" />
+            <img src="{{ blog_img.url }}" alt="{{ blog_img.alt }}" class="card-img-top">
           </a>
-        </div>
-        <div class="col-9">
-          <a href="{{ post.url }}">{{ post.blog_title }}</a>
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="{{ post.url }}" class="text-decoration-none text-dark">
+                {{ post.blog_title }}
+              </a>
+            </h5>
+          </div>
         </div>
       </div>
     {% endfor %}
   </div>
 
-  <!-- React root and data (should appear only once) -->
+  <!-- ✅ React root and data -->
   <script type="application/json" id="posts-data">
     {{ posts_json|safe }}
   </script>
-  <div id="blog-page"></div>
+  <div id="blog-page" class="mt-5"></div>
 
-  <!-- React JS bundle -->
+  <!-- ✅ React JS bundle -->
   <script type="module" src="{% static 'js/react-widget.js' %}"></script>
+</div>
 {% endblock %}

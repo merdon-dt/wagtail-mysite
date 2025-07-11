@@ -1,3 +1,4 @@
+from linecache import cache
 from django.db import models
 from wagtail.models import Orderable
 from modelcluster.models import ClusterableModel
@@ -5,7 +6,8 @@ from modelcluster.fields import ParentalKey
 # from autoslug import AutoSlugField
 from wagtail.snippets.models import register_snippet
 from wagtail.admin.panels import FieldPanel, PageChooserPanel, InlinePanel, MultiFieldPanel
-
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 
 class MenuItem(Orderable):
 
@@ -71,3 +73,10 @@ class Menu(ClusterableModel):
 
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        key = make_template_fragment_key(
+            'nav_menu'
+        )
+        cache.delete(key)
+        return super().save(*args, **kwargs)

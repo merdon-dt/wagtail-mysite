@@ -2,20 +2,36 @@
 {% load static wagtailcore_tags %}
 
 {% block content %}
-<div>{{ page.subtitle }}
+<div class="container py-5">
+
+  <!-- Optional subtitle -->
+  {% if page.subtitle %}
+    <h2 class="mb-4">{{ page.subtitle }}</h2>
+  {% endif %}
+
+  <!-- StreamField blocks -->
+  {% for block in page.content %}
+    <div class="mb-4">
+      <p class="text-muted small">Block type: <strong>{{ block.block_type }}</strong></p>
+      {% include_block block %}
+    </div>
+  {% endfor %}
+
+  <!-- React root container -->
+  <div id="react-root" class="mt-5"></div>
+
 </div>
-    {% for block in page.content %}
-        <p>Block type: {{ block.block_type }}</p>
 
-        {% include_block block %}
-    {% endfor %}
+<!-- ✅ React JS bundle -->
+<script type="module" src="{% static 'js/react-widget.js' %}"></script>
 
-    <div id="react-root"></div>
-
-  <!-- React JS bundle -->
-  <script type="module" src="{% static 'js/react-widget.js' %}"></script>
-  <script>
-  window.initialData = {{ some_context_var|json_script:"initial-data" }};
+<!-- ✅ Initial data injection -->
+<script>
+  window.initialData = JSON.parse(
+    document.getElementById("initial-data").textContent
+  );
 </script>
-
-{% endblock content %}
+<script id="initial-data" type="application/json">
+  {{ some_context_var|json_script:"initial-data" }}
+</script>
+{% endblock %}

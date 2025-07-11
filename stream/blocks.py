@@ -73,6 +73,14 @@ class LinkStructBlock(StructValue):
             print("the page url is", external_url)
             return external_url
         return None
+    def title(self):
+        page = self.get('page_url')
+        external_url = self.get('page_link')
+        if page:
+            return page.title
+        elif external_url:
+            return external_url  # or you can return a hardcoded label like "External Link"
+        return "Untitled"
 
 class SingleButtonBlock(blocks.StructBlock):
     
