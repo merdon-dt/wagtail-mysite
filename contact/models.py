@@ -14,6 +14,8 @@ class FormField(AbstractFormField):
 
 class ContactPage(AbstractEmailForm):
     template = "contact/contact_page.html"
+    max_count = 1
+    subpage_types = []
     
     intro = models.CharField(
         max_length=255,

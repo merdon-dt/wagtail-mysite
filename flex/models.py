@@ -7,6 +7,8 @@ from stream import blocks  # Your custom blocks like TextAndTitleBlocks
 
 class Flex(Page):
     template = 'flex/flex_page.html'
+    subpage_types = []
+    
     content = StreamField(
         [
             ('text_and_title', blocks.TextAndTitleBlocks()),
