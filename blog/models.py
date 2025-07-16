@@ -18,7 +18,6 @@ from django.core.cache.utils import make_template_fragment_key
 from wagtail.api import APIField
 from taggit.models import TaggedItemBase
 from modelcluster.contrib.taggit import ClusterTaggableManager
-from blog.serializers import BlogListingPageSerializer
 
 import json
 
@@ -26,10 +25,12 @@ import json
 
 
 # Import your custom StreamField blocks
-from blog import serializers
-from blog.serializers import ImageSerializerField
-from mysite import api
-from stream import blocks  # Make sure 'stream.blocks' exists and is in INSTALLED_APPS
+
+# from mysite import api
+from blog.fields import ImageSerializerField
+from blog.serializers import BlogDetailsPageSerializer, CategorySerializer, TagSerializer
+from stream import blocks
+from stream.serializers import StreamSerializer  # Make sure 'stream.blocks' exists and is in INSTALLED_APPS
 
 
 class BlogPostTag(TaggedItemBase):
@@ -75,10 +76,12 @@ class BlogListingPage(RoutablePageMixin, Page):
         ]
         context["posts_json"] = mark_safe(json.dumps(serialized_posts))
         return context
+    def get_blog_list(self):
+        return self.get_children().live().specific()
     
     api_fields = [
         APIField('custom_title'),
-        APIField('post-listing', serializer=BlogListingPageSerializer()),
+        APIField('blog_list', serializer=BlogDetailsPageSerializer(source='get_blog_list', many=True)),
     ]
     
     @route(r'^latest/?$', name='latest_blog_post')
@@ -198,8 +201,13 @@ class BlogDetailsPage(Page):
         FieldPanel('content'),
     ]
     
-    api_fields = [ APIField("content"),
-                  APIField("author_tags"),
+    api_fields = [
+                    APIField("blog_title"),
+                    APIField("author_tags",),
+                    APIField("blog_image", serializer=ImageSerializerField()),
+                    APIField("tags", serializer=TagSerializer(source="tags.all")),
+                    APIField("categories", serializer=CategorySerializer(source="categories.all")),
+                    APIField("content", serializer=StreamSerializer()),
                   ]
 
     def save(self, *args, **kwargs):
@@ -303,6 +311,17 @@ class ArticleBlogPage(BlogDetailsPage):
         ],heading='Categories'),
         FieldPanel('content'),
     ]
+    
+        
+    api_fields = [ 
+                  APIField("blog_title"),
+                  APIField("custom_title"),
+                  APIField("author_tags"),
+                    APIField("blog_image", serializer=ImageSerializerField()),
+                    APIField("tags", serializer=TagSerializer(source="tags.all")),
+                    APIField("categories", serializer=CategorySerializer(source="categories.all")),
+                    APIField("content", serializer=StreamSerializer()),
+                  ]
     class Meta:
         verbose_name = 'Article BLog Page'
         verbose_name_plural = 'Articles Blog Page'
@@ -329,6 +348,15 @@ class VideoBlogPage(BlogDetailsPage):
         ],heading='Categories'),
         FieldPanel('content'),
     ]
+    api_fields = [ 
+                APIField("blog_title"),
+                APIField("youtube_video_id"),
+                APIField("author_tags"),
+                APIField("blog_image", serializer=ImageSerializerField()),
+                APIField("tags", serializer=TagSerializer(source="tags.all")),
+                APIField("categories", serializer=CategorySerializer(source="categories.all")),
+                APIField("content", serializer=StreamSerializer()),
+                  ]
     
     class Meta:
         verbose_name = 'Video BLog Page'

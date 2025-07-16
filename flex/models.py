@@ -4,6 +4,9 @@ from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
 from wagtail.blocks import RichTextBlock  # Import RichTextBlock here
 from stream import blocks  # Your custom blocks like TextAndTitleBlocks
+from wagtail.api import APIField
+
+from stream.serializers import StreamSerializer
 
 class Flex(Page):
     template = 'flex/flex_page.html'
@@ -29,3 +32,5 @@ class Flex(Page):
         FieldPanel('subtitle'),
         FieldPanel('content'),
     ]
+    
+    api_fields = [APIField('subtitle'), APIField('content', serializer=StreamSerializer()),]

@@ -1,57 +1,134 @@
-
-
-
-
-from rest_framework.fields import Field
-
-class ImageSerializerField(Field):
-    def to_representation(self, value):
-        return {
-            "url": value.file.url,
-            "title": value.title,
-            "width": value.width,
-            "height": value.height
-            # "some": "value"
-        }
-        
-        
-# blog/serializers.py
+import re
 from rest_framework import serializers
-from wagtail.api.v2.serializers import PageSerializer
-from wagtail.api.v2.utils import get_full_url
-from blog.models import BlogListingPage, BlogDetailsPage
+from wagtail.images.api.fields import ImageRenditionField
+from wagtail.images.models import Image
 
+class BlogDetailsPageSerializer(serializers.Serializer):
 
-class BlogListingPageSerializer(PageSerializer):
-    """Serializer for blog listing page - only what you need."""
+    id = serializers.IntegerField()
+    title= serializers.CharField()
+    blog_title= serializers.CharField()
+    slug= serializers.CharField()
+    content= serializers.JSONField()
+    # date_created= serializers.DateTimeField()
+    # date_updated= serializers.DateTimeField()
+    blog_image = ImageRenditionField('fill-800x400',)
     
-    posts_data = serializers.SerializerMethodField()
     
-    class Meta:
-        model = BlogListingPage
-        fields = PageSerializer.Meta.fields + [
-            'custom_title',
-            'posts_data',
-        ]
+    # def to_representation(self, instance):
+    #     print("📦 Object:", model_to_dict(instance))
+    #     return super().to_representation(instance)
+
+    # def get_tags(self, obj):
+    #     return [tag.name for tag in obj.tags.all()]
+
+    # def get_categories(self, obj):
+    #     return [cat.name for cat in obj.categories.all()]
+
+    # def get_authors(self, obj):
+    #     return [author.author_name for author in obj.author_tags.all()]
     
-    def get_posts_data(self, obj):
-        """Get posts data matching your current JSON structure."""
-        request = self.context['request']
-        posts = BlogDetailsPage.objects.live().public()
         
-        # Apply tag filtering if present (same as your current logic)
-        tag = request.GET.get('tag')
-        if tag:
-            posts = posts.filter(tags__slug=tag)
-        
-        # Return the same structure you're already using
-        return [
-            {
-                "id": post.id,
-                "title": post.blog_title,
-                "url": get_full_url(request, post.url),
-                "image_url": get_full_url(request, post.blog_image.file.url) if post.blog_image else "",
-                "image_alt": post.blog_image.title if post.blog_image else "",
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        print("\n🔍 START SERIALIZER FOR:", instance)
+        print("📦 Initial data:", data)
+
+        enriched_blocks = []
+
+        # Loop through each block in the StreamField
+        for block in instance.content:  # block is a StreamChild
+            print("\n🧩 New block:")
+            print("🔹 Raw block:", block)
+
+            block_type = block.block_type
+            value = block.value
+
+            print("🔸 Block type:", block_type)
+            print("🔸 Raw block value:", value)
+
+            # Convert StructValue or ListValue into a plain Python dict
+            try:
+                raw_value = block.block.get_api_representation(value, context=self.context)
+                print("✅ Converted value to API-safe dict:", raw_value)
+            except Exception as e:
+                print("❌ Failed to convert value to dict:", e)
+                raw_value = value  # fallback (may cause errors if not serializable)
+
+            # Handle card_blocks (List of cards with image)
+            if block_type == "card_blocks":
+                print("📦 Handling card_blocks")
+                for card in raw_value.get("card", []):
+                    print("🃏 Card:", card)
+                    image_id = card.get("image")
+                    print("🖼️ Card image ID:", image_id)
+
+                    if image_id:
+                        try:
+                            image = Image.objects.get(id=image_id)
+                            print("✅ Found image:", image)
+                            rendition = image.get_rendition("fill-800x400")
+                            print("✅ Got rendition:", rendition.url)
+
+                            card["image"] = {
+                                "url": rendition.url,
+                                "alt": image.title,
+                            }
+                        except Exception as e:
+                            print("❌ Error processing image:", e)
+                            card["image"] = None
+
+            # Handle CTA block (one image)
+            elif block_type == "cta_blocks":
+                print("📦 Handling cta_blocks")
+                image_id = raw_value.get("image")
+                print("🖼️ CTA image ID:", image_id)
+
+                if image_id:
+                    try:
+                        image = Image.objects.get(id=image_id)
+                        print("✅ Found image:", image)
+                        rendition = image.get_rendition("fill-800x400")
+                        print("✅ Got rendition:", rendition.url)
+
+                        raw_value["image"] = {
+                            "url": rendition.url,
+                            "alt": image.title,
+                        }
+                    except Exception as e:
+                        print("❌ Error processing CTA image:", e)
+                        raw_value["image"] = None
+
+            enriched_block = {
+                "type": block_type,
+                "value": raw_value
             }
-            for post in posts
-        ]       
+            print("✅ Final enriched block:", enriched_block)
+
+            enriched_blocks.append(enriched_block)
+
+        # Replace content with enriched version
+        data["content"] = enriched_blocks
+        print("\n✅ Final serialized data for blog post:", data)
+        return data
+            
+            
+class TagSerializer(serializers.Serializer):
+    def to_representation(self, value):
+        tag_names = [tag.name for tag in value]
+        return tag_names
+    
+class CategorySerializer(serializers.Serializer):
+    def to_representation(self, value):
+        cat_names = [cat.name for cat in value]
+        return cat_names    
+    
+# class AuthorTagSerializer(serializers.Serializer):
+#     def to_representation(self, value):
+#        author_details = [{
+#             "author_name": author.author_name,
+#             "author_website": author.author_website,
+#             "author_image": author.author_image,
+#         } for author in value]    
+#        return author_details
