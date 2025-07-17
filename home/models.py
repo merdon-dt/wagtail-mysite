@@ -9,7 +9,7 @@ from wagtail.api import APIField
 
 class HomePage(Page):
     
-    subpage_types = ['blog.BlogListingPage', 'contact.ContactPage', 'flex.Flex']
+    subpage_types = ['blog.BlogListingPage', 'contact.ContactPage', 'flex.Flex', 'product.ProductListingPage']
     parent_page_types = ['wagtailcore.Page']
     max_count = 1
     

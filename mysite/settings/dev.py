@@ -31,6 +31,6 @@ except ImportError:
 CACHES = {
     "default" : {
         "BACKEND" : "django.core.cache.backends.filebased.FileBasedCache",
-        "LOCATION" : "D:\Merdon\WorkSpace\Wagtail\mysite\cache",
+        "LOCATION": r"D:\Merdon\WorkSpace\Wagtail\mysite\cache"
     }
 }
