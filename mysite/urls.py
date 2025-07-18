@@ -6,6 +6,7 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
+from blog.views import TagBlogAPIView
 from search import views as search_views
 from .api import api_router
 
@@ -15,6 +16,9 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     path("api/v2/", api_router.urls),
+    # Custom
+    path('api/tags/<slug:slug>/', TagBlogAPIView.as_view(), name='tag-api'),
+
     
 ]
 
@@ -31,5 +35,6 @@ if settings.DEBUG:
 
 # ✅ This must be last
 urlpatterns += [
+
     path("", include(wagtail_urls)),
 ]
