@@ -13,14 +13,17 @@ class BlogDetailsPageSerializer(serializers.Serializer):
     # date_created= serializers.DateTimeField()
     # date_updated= serializers.DateTimeField()
     blog_image = ImageRenditionField('fill-800x400',)
+    tags = serializers.SerializerMethodField()
+    # categories = serializers.SerializerMethodField()
+    # authors = serializers.SerializerMethodField()
     
     
     # def to_representation(self, instance):
     #     print("📦 Object:", model_to_dict(instance))
     #     return super().to_representation(instance)
 
-    # def get_tags(self, obj):
-    #     return [tag.name for tag in obj.tags.all()]
+    def get_tags(self, obj):
+        return [tag.name for tag in obj.tags.all()]
 
     # def get_categories(self, obj):
     #     return [cat.name for cat in obj.categories.all()]

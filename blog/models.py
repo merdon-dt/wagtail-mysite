@@ -1,3 +1,4 @@
+from importlib.metadata import PackageNotFoundError
 from django.db import models
 from django.shortcuts import render
 from django.utils.safestring import mark_safe
@@ -20,7 +21,7 @@ from taggit.models import TaggedItemBase
 from modelcluster.contrib.taggit import ClusterTaggableManager
 
 import json
-
+from rest_framework.response import Response
 
 
 
@@ -89,6 +90,12 @@ class BlogListingPage(RoutablePageMixin, Page):
         context = self.get_context(request, *args, **kwargs)
         context['posts_limit'] = BlogDetailsPage.objects.live().public()[:1]
         return render(request, 'blog/latest_blogs.html', context)
+    
+    # @route(r"^api/tags/(?P<slug>[-\w]+)/$", name='tag_blogs')
+    # def tag_blogs(self, request, slug):
+    #     post_tags = BlogDetailsPage.objects.live().public().filter(tags__slug=slug)
+    #     serializer = BlogDetailsPageSerializer(post_tags, many=True)
+    #     return Response({"tag": slug, "posts": serializer.data})
 
     
     # def get_context(self, request, *args, **kwargs):  # Fixed: should be get_context not _get_context
